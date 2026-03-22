@@ -1,0 +1,52 @@
+{
+  "data": [
+    {
+      "timestamp": "2019-07-22T19:12:45.617Z",
+      "score": 90,
+      "sensors": [
+        {
+          "comp": "temp",
+          "value": 24.49999961853027
+        },
+        {
+          "comp": "humid",
+          "value": 49.999999618530275
+        },
+        {
+          "comp": "co2",
+          "value": 419
+        },
+        {
+          "comp": "voc",
+          "value": 399
+        },
+        {
+          "comp": "pm25",
+          "value": 5
+        }
+      ],
+      "indices": [
+        {
+          "comp": "temp",
+          "value": 0
+        },
+        {
+          "comp": "humid",
+          "value": 0
+        },
+        {
+          "comp": "co2",
+          "value": 0
+        },
+        {
+          "comp": "voc",
+          "value": 1
+        },
+        {
+          "comp": "pm25",
+          "value": 4
+        }
+      ]
+    }
+  ]
+}
