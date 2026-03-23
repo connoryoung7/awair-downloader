@@ -1,0 +1,28 @@
+# Git
+.git/
+.gitignore
+
+# Environment
+.env
+
+# Database files
+*.db
+
+# Go build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Development tools
+.claude/
+
+# Examples and docs
+examples/
+README.md
+Justfile
+
+# Docker files (not needed in build context)
+Dockerfile.dev
