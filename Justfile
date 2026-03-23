@@ -23,7 +23,10 @@ verify-work:
     go vet ./...
 
 run *args:
-    go run . {{args}}
+    go run ./cmd/downloader {{args}}
+
+run-tui *args:
+    go run ./cmd/tui {{args}}
 
 docker-build:
     docker build -t awair-downloader .
