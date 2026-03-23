@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/connoryoung/awair-downloader/internal/awair"
+	"github.com/connoryoung/awair-downloader/internal/domain"
 	_ "modernc.org/sqlite"
 )
 
@@ -23,15 +23,15 @@ func Open(path string) (*Store, error) {
 		timestamp   TEXT UNIQUE,
 		score       REAL,
 		temp        REAL,
-		temp_index  REAL,
+		temp_index  INTEGER,
 		humid       REAL,
-		humid_index REAL,
+		humid_index INTEGER,
 		co2         REAL,
-		co2_index   REAL,
+		co2_index   INTEGER,
 		voc         REAL,
-		voc_index   REAL,
+		voc_index   INTEGER,
 		pm25        REAL,
-		pm25_index  REAL
+		pm25_index  INTEGER
 	)`)
 	if err != nil {
 		return nil, fmt.Errorf("create table: %w", err)
@@ -44,30 +44,18 @@ func (s *Store) Close() error {
 	return s.db.Close()
 }
 
-func nullable(comp string, fn func(string) (float64, bool)) *float64 {
-	if v, ok := fn(comp); ok {
-		return &v
-	}
-	return nil
-}
-
-func (s *Store) Insert(r *awair.Reading) error {
+func (s *Store) InsertReading(r domain.Reading) error {
 	_, err := s.db.Exec(
 		`INSERT OR IGNORE INTO readings
 			(timestamp, score, temp, temp_index, humid, humid_index, co2, co2_index, voc, voc_index, pm25, pm25_index)
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		r.Timestamp.UTC().Format("2006-01-02T15:04:05Z"),
 		r.Score,
-		nullable("temp", r.Sensor),
-		nullable("temp", r.Index),
-		nullable("humid", r.Sensor),
-		nullable("humid", r.Index),
-		nullable("co2", r.Sensor),
-		nullable("co2", r.Index),
-		nullable("voc", r.Sensor),
-		nullable("voc", r.Index),
-		nullable("pm25", r.Sensor),
-		nullable("pm25", r.Index),
+		r.Temp.Value, r.Temp.Index,
+		r.Humidity.Value, r.Humidity.Index,
+		r.CO2.Value, r.CO2.Index,
+		r.VOC.Value, r.VOC.Index,
+		r.PM25.Value, r.PM25.Index,
 	)
 	return err
 }

@@ -62,13 +62,11 @@ func main() {
 					log.Printf("fetch error: %v", err)
 					continue
 				}
-				if err := s.Insert(r); err != nil {
+				if err := s.InsertReading(*r); err != nil {
 					log.Printf("insert error: %v", err)
 					continue
 				}
-				temp, _ := r.Sensor("temp")
-				co2, _ := r.Sensor("co2")
-				log.Printf("recorded: score=%.0f temp=%.1f co2=%.0f", r.Score, temp, co2)
+				log.Printf("recorded: score=%.0f temp=%.1f co2=%.0f", r.Score, r.Temp.Value, r.CO2.Value)
 			case <-sig:
 				log.Println("shutting down")
 				return
@@ -103,7 +101,7 @@ func main() {
 	}
 
 	for _, r := range readings {
-		if err := s.Insert(&r); err != nil {
+		if err := s.InsertReading(r); err != nil {
 			log.Printf("insert error: %v", err)
 		}
 	}
