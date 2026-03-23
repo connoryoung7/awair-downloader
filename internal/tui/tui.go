@@ -11,8 +11,6 @@ import (
 	"github.com/connoryoung/awair-downloader/internal/domain"
 )
 
-const pollInterval = 10 * time.Second
-
 var (
 	titleStyle = lipgloss.NewStyle().Bold(true)
 	labelStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Width(10)
@@ -58,19 +56,20 @@ type fetchedMsg struct {
 }
 
 type Model struct {
-	client  *awair.Client
-	device  domain.Device
-	reading *domain.Reading
-	err     error
-	loading bool
+	client   *awair.Client
+	device   domain.Device
+	interval time.Duration
+	reading  *domain.Reading
+	err      error
+	loading  bool
 }
 
-func New(client *awair.Client, device domain.Device) Model {
-	return Model{client: client, device: device, loading: true}
+func New(client *awair.Client, device domain.Device, interval time.Duration) Model {
+	return Model{client: client, device: device, interval: interval, loading: true}
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.fetch(), tick())
+	return tea.Batch(m.fetch(), m.tick())
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -81,7 +80,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case tickMsg:
 		m.loading = true
-		return m, tea.Batch(m.fetch(), tick())
+		return m, tea.Batch(m.fetch(), m.tick())
 	case fetchedMsg:
 		m.loading = false
 		m.reading = msg.reading
@@ -130,7 +129,7 @@ func (m Model) View() string {
 		out += line + "\n"
 	}
 
-	out += "\n" + mutedStyle.Render("Polling every 10s · q to quit")
+	out += "\n" + mutedStyle.Render("Polling every "+m.interval.String()+" · q to quit")
 	if m.err != nil {
 		out += "\n" + errorStyle.Render("Last fetch error: "+m.err.Error())
 	}
@@ -144,8 +143,8 @@ func (m Model) fetch() tea.Cmd {
 	}
 }
 
-func tick() tea.Cmd {
-	return tea.Tick(pollInterval, func(time.Time) tea.Msg {
+func (m Model) tick() tea.Cmd {
+	return tea.Tick(m.interval, func(time.Time) tea.Msg {
 		return tickMsg{}
 	})
 }
